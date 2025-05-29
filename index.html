@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Stumptown Coffee Roasters</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         /* Base Mobile-First Styles */
         * {
@@ -12,12 +13,15 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: #1a1a1a;
             color: #ffffff;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
@@ -34,7 +38,14 @@
                 height: auto;
                 flex-direction: column;
                 gap: 0.5rem;
-                position: relative;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background-color: rgba(0, 0, 0, 0.95);
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
             }
 
             .logo img {
@@ -50,12 +61,54 @@
                 gap: 0.8rem;
                 padding: 0.5rem 0;
                 flex-wrap: wrap;
+                background-color: rgba(0, 0, 0, 0.9);
             }
 
             nav a {
                 font-size: 0.9rem;
                 padding: 0.4rem 0.6rem;
                 white-space: nowrap;
+                min-height: 44px;
+                min-width: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .hero {
+                flex-direction: column;
+                padding: 1rem;
+                min-height: auto;
+                gap: 2rem;
+                padding-top: 120px;
+            }
+
+            .coffee-list, .transform-content {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                padding: 1rem;
+            }
+
+            .transform-content h1 {
+                font-size: 2rem;
+                text-align: center;
+            }
+
+            .transform-content p {
+                font-size: 1rem;
+                text-align: center;
+            }
+
+            .coffee-shop-label {
+                text-align: center;
+                margin: 0 auto;
+            }
+
+            .coffee-items {
+                max-height: none;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             }
         }
 
@@ -209,31 +262,37 @@
         /* Touch-friendly elements */
         button, 
         .order-btn,
-        nav a,
-        .faq-question {
+        .faq-question,
+        nav a {
             min-height: 44px;
             min-width: 44px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* Improve form elements for mobile */
         input,
         textarea,
         select {
-            font-size: 16px; /* Prevents zoom on iOS */
+            font-size: 16px;
             padding: 12px;
             border-radius: 8px;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         /* Add smooth scrolling for mobile */
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 80px; /* Adjust based on your header height */
+            scroll-padding-top: 80px;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* Improve image loading on mobile */
         img {
             max-width: 100%;
             height: auto;
+            display: block;
         }
 
         /* Add loading state for images */
@@ -1152,6 +1211,25 @@
                 height: 220px;
             }
         }
+
+        /* Mobile Menu Animation */
+        @media (max-width: 768px) {
+            header.scroll-down {
+                transform: translateY(-100%);
+            }
+
+            header.scroll-up {
+                transform: translateY(0);
+            }
+
+            nav {
+                transition: transform 0.3s ease;
+            }
+
+            nav.hidden {
+                transform: translateY(-100%);
+            }
+        }
     </style>
 </head>
 <body>
@@ -1599,138 +1677,73 @@
         </div>
     </footer>
 
-    <!-- Add Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
     <script>
-        // FAQ Toggle
-        document.querySelectorAll('.faq-question').forEach(question => {
-            question.addEventListener('click', () => {
-                const faqItem = question.parentElement;
-                faqItem.classList.toggle('active');
-                
-                const icon = question.querySelector('.toggle-icon');
-                icon.textContent = faqItem.classList.contains('active') ? '-' : '+';
-            });
-        });
-
-        // Smooth Scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-        // Testimonial Animation
-        const testimonialCards = document.querySelectorAll('.testimonial-card');
-        testimonialCards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-10px)';
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'translateY(0)';
-            });
-        });
-
-        // Add this to your existing script section
-        document.querySelectorAll('.order-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const coffeeName = this.closest('.coffee-item').querySelector('h3').textContent;
-                alert(`Thank you for ordering ${coffeeName}! We'll prepare it right away.`);
-            });
-        });
-
-        // Add mobile menu functionality
         document.addEventListener('DOMContentLoaded', function() {
-            // Mobile menu toggle
+            // Mobile menu functionality
             const header = document.querySelector('header');
+            const nav = document.querySelector('nav');
             let lastScroll = 0;
+            let isScrolling;
 
             window.addEventListener('scroll', () => {
                 const currentScroll = window.pageYOffset;
                 
-                if (currentScroll <= 0) {
-                    header.classList.remove('scroll-up');
-                    return;
-                }
+                // Clear our timeout throughout the scroll
+                window.clearTimeout(isScrolling);
                 
-                if (currentScroll > lastScroll && !header.classList.contains('scroll-down')) {
-                    // Scroll Down
-                    header.classList.remove('scroll-up');
-                    header.classList.add('scroll-down');
-                } else if (currentScroll < lastScroll && header.classList.contains('scroll-down')) {
-                    // Scroll Up
-                    header.classList.remove('scroll-down');
-                    header.classList.add('scroll-up');
-                }
-                lastScroll = currentScroll;
+                // Set a timeout to run after scrolling ends
+                isScrolling = setTimeout(function() {
+                    if (currentScroll <= 0) {
+                        header.classList.remove('scroll-up');
+                        return;
+                    }
+                    
+                    if (currentScroll > lastScroll && !header.classList.contains('scroll-down')) {
+                        header.classList.remove('scroll-up');
+                        header.classList.add('scroll-down');
+                        nav.classList.add('hidden');
+                    } else if (currentScroll < lastScroll && header.classList.contains('scroll-down')) {
+                        header.classList.remove('scroll-down');
+                        header.classList.add('scroll-up');
+                        nav.classList.remove('hidden');
+                    }
+                    lastScroll = currentScroll;
+                }, 66);
+            });
+
+            // Touch event handling
+            const touchElements = document.querySelectorAll('button, .order-btn, nav a');
+            touchElements.forEach(element => {
+                element.addEventListener('touchstart', function(e) {
+                    this.style.opacity = '0.7';
+                    e.preventDefault(); // Prevent double-tap zoom on mobile
+                });
+                element.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                });
+            });
+
+            // Prevent zoom on double tap
+            document.addEventListener('dblclick', function(e) {
+                e.preventDefault();
             });
 
             // Improve mobile performance
             const images = document.querySelectorAll('img');
             images.forEach(img => {
                 img.setAttribute('loading', 'lazy');
+                img.setAttribute('decoding', 'async');
             });
 
-            // Add touch feedback
-            const touchElements = document.querySelectorAll('button, .order-btn, nav a');
-            touchElements.forEach(element => {
-                element.addEventListener('touchstart', function() {
-                    this.style.opacity = '0.7';
-                });
-                element.addEventListener('touchend', function() {
-                    this.style.opacity = '1';
-                });
-            });
-        });
-
-        // Add this to your existing script section
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get all sections
-            const sections = document.querySelectorAll('section[id]');
-            
-            // Get all navigation links
-            const navLinks = document.querySelectorAll('nav a');
-            
-            // Function to update active navigation link
-            function updateActiveLink() {
-                const scrollPosition = window.scrollY;
-                
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop - 100; // Adjust offset as needed
-                    const sectionHeight = section.offsetHeight;
-                    const sectionId = section.getAttribute('id');
-                    
-                    if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                        navLinks.forEach(link => {
-                            link.classList.remove('active');
-                            if (link.getAttribute('href') === `#${sectionId}`) {
-                                link.classList.add('active');
-                            }
-                        });
-                    }
-                });
-            }
-            
-            // Add scroll event listener
-            window.addEventListener('scroll', updateActiveLink);
-            
-            // Update active link on page load
-            updateActiveLink();
-            
-            // Smooth scroll for navigation links
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
+            // Add smooth scroll for mobile
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
                     e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    const targetSection = document.querySelector(targetId);
-                    
-                    if (targetSection) {
-                        targetSection.scrollIntoView({
-                            behavior: 'smooth'
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
                         });
                     }
                 });
